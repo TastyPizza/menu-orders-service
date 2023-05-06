@@ -1,5 +1,6 @@
 package com.tastypizza.menuorders.entities
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import lombok.Getter
 import lombok.Setter
 import javax.persistence.*
@@ -24,8 +25,10 @@ data class MenuItemOption (
     @JoinColumn(name = "menuItem_id")
     val menuItem: MenuItem?=null,
 
-    @ManyToMany(mappedBy = "menuItemOptions")
-    val orders: List<Order> = emptyList()
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "menuItemOption")
+    val orderItems: Set<OrderItem> = emptySet()
 
 
 ) {
