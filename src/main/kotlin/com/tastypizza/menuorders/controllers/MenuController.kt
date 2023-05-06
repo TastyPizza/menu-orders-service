@@ -4,24 +4,24 @@ import com.tastypizza.menuorders.entities.MenuItem
 import com.tastypizza.menuorders.entities.MenuItemOption
 import com.tastypizza.menuorders.enums.ItemType
 import com.tastypizza.menuorders.repositories.MenuItemRepository
+import com.tastypizza.menuorders.services.MenuItemService
 import org.aspectj.bridge.Message
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/menu")
-class MenuController(val menuItemRepository: MenuItemRepository) {
-    @GetMapping("/")
-    fun index(): List<MenuItemOption> {
-        if (menuItemRepository.count() == 0L) {
-            val menuItem = MenuItem(ItemType.OTHER, true, "Деревенская", "Деревенская с картошечкой")
-            val menuItemOption = MenuItemOption()
-            menuItem.menuItemOptions.add(menuItemOption)
-            menuItemRepository.save(menuItem)
+class MenuController() {
 
-        }
-//        menuItemRepository.save(MenuItem(ItemType.OTHER, false, "Тест", null))
-        return emptyList()
+    @Autowired
+    private lateinit var menuItemService: MenuItemService
+
+    @GetMapping("/")
+    fun getAllMenuItems(): List<MenuItem> {
+        print("121221")
+        return menuItemService.findAll()
     }
 }

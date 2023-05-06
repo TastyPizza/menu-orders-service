@@ -20,6 +20,7 @@ data class Order (
     val orderItems: MutableList<OrderItem> = mutableListOf(),
     val restaurantId: Int?=0,
     val orderDate: String?="",
+    var status: OrderStatus?=OrderStatus.NEW,
     val packing: Boolean?=false
 
 )
