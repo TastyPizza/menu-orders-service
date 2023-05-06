@@ -16,11 +16,14 @@ data class Order (
 
 
     val clientId: Int?=0,
-    @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
-    val orderItems: MutableList<OrderItem> = mutableListOf(),
+//    @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+//    val orderItems: MutableList<OrderItem> = mutableListOf(),
     val restaurantId: Int?=0,
     val orderDate: String?="",
     var status: OrderStatus?=OrderStatus.NEW,
-    val packing: Boolean?=false
+    val packing: Boolean?=false,
+
+    @ManyToMany
+    val menuItemOptions: List<MenuItemOption> = emptyList()
 
 )

@@ -22,7 +22,10 @@ data class MenuItemOption (
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "menuItem_id")
-    val menuItem: MenuItem?=null
+    val menuItem: MenuItem?=null,
+
+    @ManyToMany(mappedBy = "menuItemOptions")
+    val orders: List<Order> = emptyList()
 
 
 ) {
