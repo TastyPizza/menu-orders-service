@@ -7,6 +7,7 @@ import javax.persistence.*
 @Entity
 @Getter
 @Setter
+@Table(name="menuItemOption")
 data class MenuItemOption (
     val count: Int?=0,
     val name: String?="",
@@ -18,9 +19,12 @@ data class MenuItemOption (
     val fats: Int?=0,
     val carbohydrates: Int?=0,
     val traditionalDough: Boolean?=false,
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "menuItem_id")
-//    val menuItem: MenuItem?=null
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "menuItem_id")
+    val menuItem: MenuItem?=null
+
+
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

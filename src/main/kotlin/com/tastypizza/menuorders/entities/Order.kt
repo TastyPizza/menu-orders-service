@@ -8,16 +8,18 @@ import javax.persistence.*
 @Entity
 @Getter
 @Setter
+@Table(name="orders")
 data class Order (
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long? = 0,
+
+
     val clientId: Int?=0,
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     val orderItems: MutableList<OrderItem> = mutableListOf(),
     val restaurantId: Int?=0,
     val orderDate: String?="",
-    var status: OrderStatus?=OrderStatus.NEW,
     val packing: Boolean?=false
-) {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long? = null
-}
+
+)

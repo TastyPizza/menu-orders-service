@@ -8,12 +8,13 @@ import javax.persistence.*
 @Entity
 @Getter
 @Setter
+@Table(name="menuItem")
 data class MenuItem (
     val type: ItemType?=ItemType.OTHER,
     val newBadge: Boolean?=false,
     val name: String?="",
     val description: String?="",
-    @OneToMany(cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "menuItem", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     val menuItemOptions: MutableList<MenuItemOption> = mutableListOf()
 ) {
     @Id
