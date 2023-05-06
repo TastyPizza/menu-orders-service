@@ -4,13 +4,11 @@ import com.tastypizza.menuorders.entities.MenuItem
 import com.tastypizza.menuorders.entities.Order
 import com.tastypizza.menuorders.entities.User
 import com.tastypizza.menuorders.enums.OrderStatus
+import com.tastypizza.menuorders.requests.MakeOrderRequest
 import com.tastypizza.menuorders.services.MenuItemService
 import com.tastypizza.menuorders.services.OrderService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/orders")
@@ -32,5 +30,13 @@ class OrderController() {
     @PostMapping("/changeStatus")
     fun changeOrderStatus(user: User, orderId: Long, orderStatus: OrderStatus): Order {
         return orderService.changeStatusOrder(user, orderId, orderStatus)
+    }
+
+    @PostMapping("/order")
+    fun order(@RequestBody makeOrderRequest: MakeOrderRequest): Boolean {
+        print(makeOrderRequest.clientId)
+        print(makeOrderRequest.toString())
+        return orderService.order(makeOrderRequest)
+
     }
 }

@@ -21,7 +21,6 @@ class MenuController() {
 
     @GetMapping("/")
     fun getAllMenuItems(): List<MenuItem> {
-        print("121221")
         return menuItemService.findAll()
     }
 }
