@@ -30,6 +30,11 @@ class OrderService {
         return orderRepository.findAllByRestaurantIdAndStatusNot(restaurantId, OrderStatus.GIVEN)
     }
 
+    fun check(): Boolean{
+        return true;
+        //todo заглушка
+    }
+
     @Transactional
     fun changeStatusOrder(user: User, orderId: Long, orderStatus: OrderStatus): Order {
         val order = orderRepository.findById(orderId).get()
@@ -38,23 +43,25 @@ class OrderService {
         return order
     }
 
+    @Transactional
     fun order(makeOrderRequest: MakeOrderRequest): Boolean {
+        if (!check()) return false
+
         val order = Order()
         order.clientId = makeOrderRequest.clientId
         order.orderDate = makeOrderRequest.orderDate
         order.packing = makeOrderRequest.packing
         order.status = makeOrderRequest.status
+        orderRepository.save(order)
 
         for (orderItemDto in makeOrderRequest.listOfOrderItemDto!!) {
-            val count = orderItemDto.count
             val menuItemOption = menuItemOptionRepository.findById(orderItemDto.menuItemOptionId).get()
 
             val orderItem = OrderItem()
             orderItem.order = order
             orderItem.menuItemOption = menuItemOption
-
+            orderItem.count = orderItemDto.count
             orderItemRepository.save(orderItem)
-
         }
         return true
     }
