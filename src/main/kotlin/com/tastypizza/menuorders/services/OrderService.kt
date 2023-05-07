@@ -2,13 +2,14 @@ package com.tastypizza.menuorders.services
 
 import com.tastypizza.menuorders.entities.*
 import com.tastypizza.menuorders.enums.OrderStatus
-import com.tastypizza.menuorders.repositories.MenuItemOptionRepository
-import com.tastypizza.menuorders.repositories.MenuItemRepository
-import com.tastypizza.menuorders.repositories.OrderItemRepository
-import com.tastypizza.menuorders.repositories.OrderRepository
+import com.tastypizza.menuorders.exceptions.IngredientsOutException
+import com.tastypizza.menuorders.exceptions.ResourceNotFoundException
+import com.tastypizza.menuorders.repositories.*
 import com.tastypizza.menuorders.requests.MakeOrderRequest
+import com.tastypizza.menuorders.util.CountsObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.web.bind.annotation.PathVariable
 import javax.transaction.Transactional
 
 @Service
@@ -22,6 +23,10 @@ class OrderService {
     @Autowired
     private lateinit var orderItemRepository: OrderItemRepository
 
+
+    @Autowired
+    private lateinit var ingredientsMenuItemsRepository: IngredientsMenuItemsRepository
+
     fun currentOrders(user: User): List<Order> {
         return orderRepository.findAllByClientIdAndStatusNot(user.id, OrderStatus.GIVEN)
     }
@@ -30,9 +35,16 @@ class OrderService {
         return orderRepository.findAllByRestaurantIdAndStatusNot(restaurantId, OrderStatus.GIVEN)
     }
 
-    fun check(): Boolean{
-        return true;
-        //todo заглушка
+    fun check(menuItemId: Long, restaurantId: Long): Boolean {
+        val listOfCounts: List<CountsObject> =
+            ingredientsMenuItemsRepository.checkForIngredients(restaurantId, menuItemId)
+                .orElseThrow { ResourceNotFoundException("Запрашиваемый ресурс не был найден!") }
+
+        for (elem in listOfCounts)
+            if (elem.menuItemCount > elem.restaurantCount)
+                throw IngredientsOutException("Заказ не может быть выполнен из-за отсутствия необходимых ингредиентов")
+
+        return true
     }
 
     @Transactional

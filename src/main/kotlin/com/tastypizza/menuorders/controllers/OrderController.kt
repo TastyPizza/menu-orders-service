@@ -8,6 +8,7 @@ import com.tastypizza.menuorders.requests.MakeOrderRequest
 import com.tastypizza.menuorders.services.MenuItemService
 import com.tastypizza.menuorders.services.OrderService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -20,6 +21,12 @@ class OrderController() {
     @GetMapping("/currentOrders")
     fun getCurrentOrders(user: User): List<Order> {
         return orderService.currentOrders(user)
+    }
+
+    @GetMapping("check-menu-item/{menuItemId}/{restaurantId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun checkMenuItem(@PathVariable menuItemId: Long, @PathVariable restaurantId: Long) {
+        orderService.check(menuItemId, restaurantId)
     }
 
     @GetMapping("/currentOrdersInRestaurant")
