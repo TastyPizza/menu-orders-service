@@ -9,7 +9,6 @@ import com.tastypizza.menuorders.requests.MakeOrderRequest
 import com.tastypizza.menuorders.util.CountsObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.PathVariable
 import javax.transaction.Transactional
 
 @Service
@@ -25,7 +24,7 @@ class OrderService {
 
 
     @Autowired
-    private lateinit var ingredientsMenuItemsRepository: IngredientsMenuItemsRepository
+    private lateinit var ingredientsMenuItemOptionsRepository: IngredientsMenuItemOptionsRepository
 
     fun currentOrders(user: User): List<Order> {
         return orderRepository.findAllByClientIdAndStatusNot(user.id, OrderStatus.GIVEN)
@@ -35,15 +34,18 @@ class OrderService {
         return orderRepository.findAllByRestaurantIdAndStatusNot(restaurantId, OrderStatus.GIVEN)
     }
 
-    fun check(menuItemId: Long, restaurantId: Long): Boolean {
+    fun check(menuItemOptionId: Long, restaurantId: Long): Boolean {
         val listOfCounts: List<CountsObject> =
-            ingredientsMenuItemsRepository.checkForIngredients(restaurantId, menuItemId)
+            ingredientsMenuItemOptionsRepository.checkForIngredients(restaurantId, listOf(menuItemOptionId))
                 .orElseThrow { ResourceNotFoundException("Запрашиваемый ресурс не был найден!") }
 
-        for (elem in listOfCounts)
-            if (elem.menuItemCount > elem.restaurantCount)
-                throw IngredientsOutException("Заказ не может быть выполнен из-за отсутствия необходимых ингредиентов")
-
+        for (elem in listOfCounts) {
+            if (elem.menuItemCount > elem.restaurantCount) {
+                val menuItemOption: MenuItemOption = menuItemOptionRepository.findById(menuItemOptionId)
+                    .orElseThrow { ResourceNotFoundException("Запрашиваемый ресурс не был найден!") }
+                throw IngredientsOutException("Недостаточно ингредиентов для приготовления " + menuItemOption.name)
+            }
+        }
         return true
     }
 

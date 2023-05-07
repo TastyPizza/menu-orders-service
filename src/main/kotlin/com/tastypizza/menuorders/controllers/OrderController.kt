@@ -23,10 +23,10 @@ class OrderController() {
         return orderService.currentOrders(user)
     }
 
-    @GetMapping("check-menu-item/{menuItemId}/{restaurantId}")
+    @GetMapping("check-menu-item/{menuItemOptionId}/{restaurantId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun checkMenuItem(@PathVariable menuItemId: Long, @PathVariable restaurantId: Long) {
-        orderService.check(menuItemId, restaurantId)
+    fun checkMenuItem(@PathVariable menuItemOptionId: Long, @PathVariable restaurantId: Long) {
+        orderService.check(menuItemOptionId, restaurantId)
     }
 
     @GetMapping("/currentOrdersInRestaurant")
