@@ -46,7 +46,7 @@ class OrderController() {
     }
 
     @GetMapping("/statuses")
-    fun getStatuses(user: User): List<OrderStatusResponse> {
+    fun getStatuses(): List<OrderStatusResponse> {
         return OrderStatus.values().map { OrderStatusResponse(it.id, it.name) }
     }
 
