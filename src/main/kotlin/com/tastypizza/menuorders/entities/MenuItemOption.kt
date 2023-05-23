@@ -28,7 +28,11 @@ data class MenuItemOption (
 
     @JsonIgnore
     @OneToMany(mappedBy = "menuItemOption")
-    val orderItems: Set<OrderItem> = emptySet()
+    val orderItems: Set<OrderItem> = emptySet(),
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "menuItemOption")
+    var ingredientsMenuItemOptions: Set<IngredientsMenuItemOptions> = emptySet()
 
 
 ) {

@@ -21,6 +21,9 @@ data class Restaurants(
     @Column(name = "phone", nullable = false, unique = true)
     var phone: String,
 
+    @OneToMany(mappedBy = "restaurant")
+    @JsonIgnore
+    var restaurantIngredients: Set<RestaurantIngredients> = emptySet()
 
 
 )

@@ -24,4 +24,12 @@ data class Ingredients(
 
     var price: Double,
 
+    @OneToMany(mappedBy = "ingredient")
+    @JsonIgnore
+    var ingredientsMenuItemOptions: Set<IngredientsMenuItemOptions> = emptySet(),
+
+    @OneToMany(mappedBy = "ingredient")
+    @JsonIgnore
+    var restaurantIngredients: Set<RestaurantIngredients> = emptySet()
+
 )

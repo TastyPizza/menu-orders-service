@@ -1,6 +1,5 @@
 package com.tastypizza.menuorders.controllers
 
-import com.tastypizza.menuorders.entities.MenuItem
 import com.tastypizza.menuorders.entities.Order
 import com.tastypizza.menuorders.entities.User
 import com.tastypizza.menuorders.enums.OrderStatus

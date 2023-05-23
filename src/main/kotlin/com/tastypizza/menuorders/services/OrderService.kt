@@ -34,9 +34,9 @@ class OrderService {
         return orderRepository.findAllByRestaurantIdAndStatusNot(restaurantId, OrderStatus.GIVEN)
     }
 
-    fun check(menuItemOptionId: Long, restaurantId: Long): Boolean {
+    fun check(menuItemOptionId: Long?, restaurantId: Long?): Boolean {
         val listOfCounts: List<CountsObject> =
-            ingredientsMenuItemOptionsRepository.checkForIngredients(restaurantId, listOf(menuItemOptionId))
+            ingredientsMenuItemOptionsRepository.checkForIngredients(restaurantId!!, listOf(menuItemOptionId!!))
                 .orElseThrow { ResourceNotFoundException("Запрашиваемый ресурс не был найден!") }
 
         for (elem in listOfCounts) {
@@ -59,7 +59,6 @@ class OrderService {
 
     @Transactional
     fun order(makeOrderRequest: MakeOrderRequest): Boolean {
-        if (!check()) return false
 
         val order = Order()
         order.clientId = makeOrderRequest.clientId
@@ -70,6 +69,7 @@ class OrderService {
 
         for (orderItemDto in makeOrderRequest.listOfOrderItemDto!!) {
             val menuItemOption = menuItemOptionRepository.findById(orderItemDto.menuItemOptionId).get()
+            if (!check(menuItemOption.id, makeOrderRequest.restaurantId)) return false;
 
             val orderItem = OrderItem()
             orderItem.order = order

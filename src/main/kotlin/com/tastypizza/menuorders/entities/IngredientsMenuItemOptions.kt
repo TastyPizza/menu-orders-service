@@ -11,11 +11,9 @@ data class IngredientsMenuItemOptions(
     val id: Long,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "ingredient", nullable = false)
     var ingredient: Ingredients,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "menuItemOption", nullable = false)
     var menuItemOption: MenuItemOption,
 
     var count: Int = 0

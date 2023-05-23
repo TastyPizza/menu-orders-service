@@ -12,11 +12,9 @@ data class RestaurantIngredients(
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "restaurant", nullable = false)
     var restaurant: Restaurants,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "ingredient", nullable = false)
     var ingredient: Ingredients,
 
     var count: Int = 0

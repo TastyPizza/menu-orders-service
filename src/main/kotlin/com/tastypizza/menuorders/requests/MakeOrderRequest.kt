@@ -12,8 +12,8 @@ import javax.validation.constraints.NotNull
 
 
 data class MakeOrderRequest(
-    val clientId: Int?=null,
-    val restaurantId: Int?=null,
+    val clientId: Long?=null,
+    val restaurantId: Long?=null,
     val orderDate: LocalDateTime?=LocalDateTime.now(),
     val status: OrderStatus?=OrderStatus.NEW,
     val packing: Boolean?=false,
