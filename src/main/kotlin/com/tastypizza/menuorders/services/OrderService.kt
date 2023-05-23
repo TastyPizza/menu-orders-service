@@ -2,11 +2,8 @@ package com.tastypizza.menuorders.services
 
 import com.tastypizza.menuorders.entities.*
 import com.tastypizza.menuorders.enums.OrderStatus
-import com.tastypizza.menuorders.exceptions.IngredientsOutException
-import com.tastypizza.menuorders.exceptions.ResourceNotFoundException
 import com.tastypizza.menuorders.repositories.*
 import com.tastypizza.menuorders.requests.MakeOrderRequest
-import com.tastypizza.menuorders.util.CountsObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import javax.transaction.Transactional
@@ -22,9 +19,11 @@ class OrderService {
     @Autowired
     private lateinit var orderItemRepository: OrderItemRepository
 
-
     @Autowired
     private lateinit var ingredientsMenuItemOptionsRepository: IngredientsMenuItemOptionsRepository
+
+    @Autowired
+    private lateinit var restaurantsIngredientsRepository: RestaurantsIngredientsRepository
 
     fun currentOrders(user: User): List<Order> {
         return orderRepository.findAllByClientIdAndStatusNot(user.id, OrderStatus.GIVEN)
@@ -35,17 +34,23 @@ class OrderService {
     }
 
     fun check(menuItemOptionId: Long?, restaurantId: Long?): Boolean {
-        val listOfCounts: List<CountsObject> =
-            ingredientsMenuItemOptionsRepository.checkForIngredients(restaurantId!!, listOf(menuItemOptionId!!))
-                .orElseThrow { ResourceNotFoundException("Запрашиваемый ресурс не был найден!") }
+        val ingredientsMenuItemOptions: List<IngredientsMenuItemOptions> =
+            ingredientsMenuItemOptionsRepository.getAllByMenuItemOption(listOf(menuItemOptionId!!))
 
-        for (elem in listOfCounts) {
-            if (elem.menuItemCount > elem.restaurantCount) {
-                val menuItemOption: MenuItemOption = menuItemOptionRepository.findById(menuItemOptionId)
-                    .orElseThrow { ResourceNotFoundException("Запрашиваемый ресурс не был найден!") }
-                throw IngredientsOutException("Недостаточно ингредиентов для приготовления " + menuItemOption.name)
+        val restaurantIngredients: List<RestaurantIngredients> =
+            restaurantsIngredientsRepository.getAllByRestaurantId(restaurantId!!)
+
+        for (ingredientsMenuItem in ingredientsMenuItemOptions) {
+
+            for (restaurantIngredient in restaurantIngredients) {
+
+                if (ingredientsMenuItem.ingredient == restaurantIngredient.ingredient) {
+                    if (restaurantIngredient.count < ingredientsMenuItem.count) return false;
+                }
             }
         }
+
+
         return true
     }
 
