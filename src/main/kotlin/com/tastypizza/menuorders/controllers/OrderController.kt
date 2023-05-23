@@ -43,6 +43,20 @@ class OrderController() {
         print(makeOrderRequest.clientId)
         print(makeOrderRequest.toString())
         return orderService.order(makeOrderRequest)
-
     }
+
+    @GetMapping("/statuses")
+    fun getStatuses(user: User): List<OrderStatusResponse> {
+        return OrderStatus.values().map { OrderStatusResponse(it.id, it.name) }
+    }
+
+    data class OrderStatusResponse(val id: Long, val status: String)
+
+
+    @PatchMapping("/update-status/{orderId}/{statusId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun updateStatus(@PathVariable orderId: Long, @PathVariable statusId: Long) {
+        orderService.updateOrderStatus(orderId, statusId)
+    }
+
 }
