@@ -6,6 +6,7 @@ import com.tastypizza.menuorders.repositories.*
 import com.tastypizza.menuorders.requests.MakeOrderRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Service
@@ -74,6 +75,7 @@ class OrderService {
 
         for (orderItemDto in makeOrderRequest.listOfOrderItemDto!!) {
             val menuItemOption = menuItemOptionRepository.findById(orderItemDto.menuItemOptionId).get()
+            menuItemOption.count = menuItemOption.count - orderItemDto.count
             if (!check(menuItemOption.id, makeOrderRequest.restaurantId)) return false;
 
             val orderItem = OrderItem()
@@ -85,10 +87,11 @@ class OrderService {
         return true
     }
 
-
-    fun updateOrderStatus(orderId: Long, statusId: Long) {
-        val order = orderRepository.findById(orderId).get()
-        order.status = OrderStatus.values().find { it.id == statusId }
-        orderRepository.save(order)
+    fun todayOrders(restaurantId: Long): List<Order>{
+        val startDate = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)
+        val endDate = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59)
+        return orderRepository.findByOrderDateBetween(startDate, endDate)
     }
+
+
 }

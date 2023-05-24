@@ -1,5 +1,6 @@
 package com.tastypizza.menuorders.entities
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.tastypizza.menuorders.enums.OrderStatus
 import lombok.AllArgsConstructor
 import lombok.Data
@@ -26,7 +27,18 @@ data class Order (
     var status: OrderStatus?=OrderStatus.NEW,
     var packing: Boolean?=false,
 
-    @OneToMany(mappedBy = "order")
+
+    @OneToMany(mappedBy = "order", fetch = FetchType.EAGER)
     var orderItems: Set<OrderItem> = emptySet()
 
-)
+
+
+) {
+    override fun hashCode(): Int {
+        return super.hashCode()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return super.equals(other)
+    }
+}

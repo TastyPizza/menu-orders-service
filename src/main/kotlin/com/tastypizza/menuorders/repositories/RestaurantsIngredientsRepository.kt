@@ -10,7 +10,7 @@ import java.util.*
 @Repository
 interface RestaurantsIngredientsRepository : JpaRepository<RestaurantIngredients, Long> {
     @Query(nativeQuery = true, value =
-    "SELECT * FROM restaurant_ingredients WHERE restaurant_ingredients.restaurant_id =: restaurant_id"
+    "SELECT * FROM restaurant_ingredients WHERE restaurant_ingredients.restaurant_id = :restaurant_id"
     )
     fun getAllByRestaurantId(
         @Param("restaurant_id") restaurantId: Long
