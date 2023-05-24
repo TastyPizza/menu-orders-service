@@ -1,5 +1,6 @@
 package com.tastypizza.menuorders.services
 
+import com.tastypizza.menuorders.dto.OrderDTO
 import com.tastypizza.menuorders.entities.*
 import com.tastypizza.menuorders.enums.OrderStatus
 import com.tastypizza.menuorders.repositories.*
@@ -7,6 +8,7 @@ import com.tastypizza.menuorders.requests.MakeOrderRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import java.util.regex.Pattern
 import javax.transaction.Transactional
 
 @Service
@@ -46,7 +48,7 @@ class OrderService {
             for (restaurantIngredient in restaurantIngredients) {
 
                 if (ingredientsMenuItem.ingredient == restaurantIngredient.ingredient) {
-                    if (restaurantIngredient.count < ingredientsMenuItem.count) return false;
+                    if (restaurantIngredient.count < ingredientsMenuItem.count) return false
                 }
             }
         }
@@ -76,7 +78,7 @@ class OrderService {
         for (orderItemDto in makeOrderRequest.listOfOrderItemDto!!) {
             val menuItemOption = menuItemOptionRepository.findById(orderItemDto.menuItemOptionId).get()
             menuItemOption.count = menuItemOption.count - orderItemDto.count
-            if (!check(menuItemOption.id, makeOrderRequest.restaurantId)) return false;
+            if (!check(menuItemOption.id, makeOrderRequest.restaurantId)) return false
 
             val orderItem = OrderItem()
             orderItem.order = order
@@ -87,10 +89,14 @@ class OrderService {
         return true
     }
 
-    fun todayOrders(restaurantId: Long): List<Order>{
+    fun todayOrders(restaurantId: Long): List<OrderDTO>{
         val startDate = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)
         val endDate = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59)
-        return orderRepository.findByOrderDateBetween(startDate, endDate)
+        
+        return orderRepository
+            .findAllByOrderDateBetween(startDate, endDate)
+            .filter { it.restaurantId?.toLong() == restaurantId }
+            .map { convertOrderToDTO(it) }
     }
 
     fun updateOrderStatus(orderId: Long, statusId: Long) {
@@ -98,6 +104,19 @@ class OrderService {
         order.status = OrderStatus.values().find { it.id == statusId }
         orderRepository.save(order)
     }
+    
+    private fun convertOrderToDTO(order: Order): OrderDTO{
+        val matcher = Pattern
+            .compile("\\d{1,2}:\\d{1,2}:\\d{1,2}")
+            .matcher(order.orderDate.toString())
 
-
+        val date = if (matcher.find()) matcher.group(0) else ""
+        
+        return OrderDTO(
+            order.id,
+            date,
+            order.status?.name.toString(),
+            if (order.packing == true) "ДА" else "НЕТ"
+        )
+    }
 }
