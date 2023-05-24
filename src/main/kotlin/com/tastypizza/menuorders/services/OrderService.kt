@@ -56,9 +56,9 @@ class OrderService {
     }
 
     @Transactional
-    fun changeStatusOrder(user: User, orderId: Long, orderStatus: OrderStatus): Order {
+    fun changeStatusOrder(orderId: Long, statusId: Long): Order {
         val order = orderRepository.findById(orderId).get()
-        order.status = orderStatus
+        order.status = OrderStatus.fromId(statusId)
         orderRepository.save(order)
         return order
     }
