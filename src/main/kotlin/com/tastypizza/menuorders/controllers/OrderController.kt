@@ -23,7 +23,7 @@ class OrderController() {
     @GetMapping("check-menu-item")
     @Operation(summary = "Проверить есть ли на складе ресторана определенные menuItemOption")
     fun checkMenuItem(@RequestParam menuItemOptionId: Long, @RequestParam restaurantId: Long): Boolean {
-        return orderService.check(menuItemOptionId, restaurantId)
+        return orderService.check(listOf(menuItemOptionId), restaurantId)
     }
 
     @GetMapping("/currentOrdersInRestaurant")
