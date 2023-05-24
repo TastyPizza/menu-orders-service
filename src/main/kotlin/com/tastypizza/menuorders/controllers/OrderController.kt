@@ -53,4 +53,19 @@ class OrderController() {
         return orderService.todayOrders(restaurantId)
     }
 
+
+    @GetMapping("/statuses")
+    fun getStatuses(): List<OrderStatusResponse> {
+        return OrderStatus.values().map { OrderStatusResponse(it.id, it.name) }
+    }
+
+    data class OrderStatusResponse(val id: Long, val status: String)
+
+
+    @PatchMapping("/update-status/{orderId}/{statusId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun updateStatus(@RequestParam orderId: Long, @RequestParam statusId: Long) {
+        orderService.updateOrderStatus(orderId, statusId)
+
+    }
 }

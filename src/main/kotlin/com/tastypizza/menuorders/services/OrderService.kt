@@ -93,5 +93,11 @@ class OrderService {
         return orderRepository.findByOrderDateBetween(startDate, endDate)
     }
 
+    fun updateOrderStatus(orderId: Long, statusId: Long) {
+        val order = orderRepository.findById(orderId).get()
+        order.status = OrderStatus.values().find { it.id == statusId }
+        orderRepository.save(order)
+    }
+
 
 }
