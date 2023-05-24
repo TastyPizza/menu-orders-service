@@ -34,6 +34,7 @@ class OrderService {
         return orderRepository.findAllByRestaurantIdAndStatusNot(restaurantId, OrderStatus.GIVEN)
     }
 
+    @Transactional
     fun check(menuItemOptionId: Long?, restaurantId: Long?): Boolean {
         val ingredientsMenuItemOptions: List<IngredientsMenuItemOptions> =
             ingredientsMenuItemOptionsRepository.getAllByMenuItemOption(listOf(menuItemOptionId!!))
@@ -46,11 +47,10 @@ class OrderService {
             for (restaurantIngredient in restaurantIngredients) {
 
                 if (ingredientsMenuItem.ingredient == restaurantIngredient.ingredient) {
-                    if (restaurantIngredient.count < ingredientsMenuItem.count) return false;
+                    if (restaurantIngredient.count < ingredientsMenuItem.count ) return false;
                 }
             }
         }
-
 
         return true
     }
@@ -71,12 +71,10 @@ class OrderService {
         order.orderDate = makeOrderRequest.orderDate
         order.packing = makeOrderRequest.packing
         order.status = makeOrderRequest.status
-        orderRepository.save(order)
-
         for (orderItemDto in makeOrderRequest.listOfOrderItemDto!!) {
             val menuItemOption = menuItemOptionRepository.findById(orderItemDto.menuItemOptionId).get()
             menuItemOption.count = menuItemOption.count - orderItemDto.count
-            if (!check(menuItemOption.id, makeOrderRequest.restaurantId)) return false;
+            if (!check(menuItemOption.id, makeOrderRequest.restaurantId)) return false
 
             val orderItem = OrderItem()
             orderItem.order = order
@@ -84,6 +82,9 @@ class OrderService {
             orderItem.count = orderItemDto.count
             orderItemRepository.save(orderItem)
         }
+
+        orderRepository.save(order)
+
         return true
     }
 
@@ -91,12 +92,6 @@ class OrderService {
         val startDate = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)
         val endDate = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59)
         return orderRepository.findByOrderDateBetween(startDate, endDate)
-    }
-
-    fun updateOrderStatus(orderId: Long, statusId: Long) {
-        val order = orderRepository.findById(orderId).get()
-        order.status = OrderStatus.values().find { it.id == statusId }
-        orderRepository.save(order)
     }
 
 
