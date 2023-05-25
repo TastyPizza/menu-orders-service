@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Orders</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        h1, td, .notice{
+            text-align: center;
+            font-family: system-ui;
+        }
+        table{
+            min-width: 70%;
+            margin: auto;
+        }
+        thead{
+            background-color: #a9bfd3;
+        }
+        tbody{
+            background-color: #edf5fc;
+        }
+        .notice{
+            font-size: 20px;
+            font-family: system-ui;
+        }
+    </style>
+</head>
+<body>
+<div class="board">
+    <h1>
+        Заказы ресторана №<span th:text="${restaurantId}"/> на <span th:text="${today}"/>
+    </h1>
+    <table th:if="${!orders.empty}">
+        <thead>
+        <tr>
+            <th> ИД </th>
+            <th> Время </th>
+            <th> Статус </th>
+            <th> Упаковать </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="order : ${orders}">
+            <td><span th:text="${order.id}"></span></td>
+            <td><span th:text="${order.date}"></span></td>
+            <td><span th:text="${order.status}"></span></td>
+            <td><span th:text="${order.packing}"></span></td>
+        </tr>
+        </tbody>
+    </table>
+    <p th:if="${orders.empty}" class="notice">
+        Сегодня в этом ресторане заказов нет
+    </p>
+</div>
+</body>
+</html>
