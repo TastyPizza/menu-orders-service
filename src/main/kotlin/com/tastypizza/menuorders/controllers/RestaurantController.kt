@@ -1,5 +1,6 @@
 package com.tastypizza.menuorders.controllers
 
+import com.tastypizza.menuorders.dto.OrderStatusesDTO
 import com.tastypizza.menuorders.enums.OrderStatus
 import com.tastypizza.menuorders.services.OrderService
 import org.springframework.stereotype.Controller
@@ -25,7 +26,7 @@ class RestaurantController (
         model.set("today", today)
         model.set("orders", orders)
         model.set("statuses", OrderStatus.values().map {
-            OrderController.OrderStatusResponse(it.id, it.name) 
+            OrderStatus.values().map { OrderStatusesDTO(it.id, it.name) }
         })
         
         return "orders"

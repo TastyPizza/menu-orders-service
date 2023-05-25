@@ -58,6 +58,4 @@ class OrderController() {
     fun getStatuses(): List<OrderStatusesDTO> {
         return OrderStatus.values().map { OrderStatusesDTO(it.id, it.name) }
     }
-
-
 }
