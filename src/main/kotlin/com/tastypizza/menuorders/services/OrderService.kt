@@ -3,6 +3,7 @@ package com.tastypizza.menuorders.services
 import com.tastypizza.menuorders.dto.OrderDTO
 import com.tastypizza.menuorders.entities.*
 import com.tastypizza.menuorders.enums.OrderStatus
+import com.tastypizza.menuorders.exceptions.IngredientsOutException
 import com.tastypizza.menuorders.repositories.*
 import com.tastypizza.menuorders.requests.MakeOrderRequest
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,9 +37,16 @@ class OrderService {
         return orderRepository.findAllByRestaurantIdAndStatusNot(restaurantId, OrderStatus.GIVEN)
     }
 
-    fun check(menuItemOptionId: Long?, restaurantId: Long?): Boolean {
+    @Transactional
+//  понял что сделал хуевый чек, ибо нужно учесть кол-во переданное в
+//  OrderItem некита + проверяю ингредиенты итеративно, то-есть на
+//  момент какой-либо итерации ингредиентов может
+//  не быть т.к уйдут на другой меню итем опшин.
+//  Фиксану завтра ща впадлу, спать буду
+
+    fun check(menuItemOptionId: List<Long>?, restaurantId: Long?): Boolean {
         val ingredientsMenuItemOptions: List<IngredientsMenuItemOptions> =
-            ingredientsMenuItemOptionsRepository.getAllByMenuItemOption(listOf(menuItemOptionId!!))
+            ingredientsMenuItemOptionsRepository.getAllByMenuItemOption(menuItemOptionId!!)
 
         val restaurantIngredients: List<RestaurantIngredients> =
             restaurantsIngredientsRepository.getAllByRestaurantId(restaurantId!!)
@@ -48,11 +56,10 @@ class OrderService {
             for (restaurantIngredient in restaurantIngredients) {
 
                 if (ingredientsMenuItem.ingredient == restaurantIngredient.ingredient) {
-                    if (restaurantIngredient.count < ingredientsMenuItem.count) return false
+                    if (restaurantIngredient.count < ingredientsMenuItem.count) throw IngredientsOutException("Недостаточно ингредиентов для приготовления этого блюда")
                 }
             }
         }
-
 
         return true
     }
@@ -68,6 +75,13 @@ class OrderService {
     @Transactional
     fun order(makeOrderRequest: MakeOrderRequest): Boolean {
 
+        val menuItemOptions: MutableList<Long> = ArrayList()
+        for (orderItemDto in makeOrderRequest.listOfOrderItemDto!!) {
+            menuItemOptions.add(orderItemDto.menuItemOptionId)
+        }
+
+        check(menuItemOptions, makeOrderRequest.restaurantId)
+
         val order = Order()
         order.clientId = makeOrderRequest.clientId
         order.orderDate = makeOrderRequest.orderDate
@@ -77,8 +91,11 @@ class OrderService {
 
         for (orderItemDto in makeOrderRequest.listOfOrderItemDto!!) {
             val menuItemOption = menuItemOptionRepository.findById(orderItemDto.menuItemOptionId).get()
+//          если то что я написал в тг - верно, то нужно вместо
+//          уменьшения каунта меню итем опшиона сделать уменьшение
+//          ингредиентов используемых для этого меню итем
+//          опшиона * на orderItemDto.count именно в рестике, куда идет заказ
             menuItemOption.count = menuItemOption.count - orderItemDto.count
-            if (!check(menuItemOption.id, makeOrderRequest.restaurantId)) return false
 
             val orderItem = OrderItem()
             orderItem.order = order

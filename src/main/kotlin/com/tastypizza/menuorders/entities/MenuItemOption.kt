@@ -10,7 +10,7 @@ import javax.persistence.*
 @Setter
 @Table(name="menuItemOption")
 data class MenuItemOption (
-    var count: Int=0,
+    var count: Long=0,
     val name: String="",
     val pictureId: String="",
     val price: Int=0,

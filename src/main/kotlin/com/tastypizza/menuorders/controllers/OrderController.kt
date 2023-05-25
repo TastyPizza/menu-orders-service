@@ -1,6 +1,7 @@
 package com.tastypizza.menuorders.controllers
 
 import com.tastypizza.menuorders.dto.OrderDTO
+import com.tastypizza.menuorders.dto.OrderStatusesDTO
 import com.tastypizza.menuorders.entities.Order
 import com.tastypizza.menuorders.enums.OrderStatus
 import com.tastypizza.menuorders.requests.MakeOrderRequest
@@ -18,11 +19,10 @@ class OrderController() {
     @Autowired
     private lateinit var orderService: OrderService
 
-    @GetMapping("check-menu-item/{menuItemOptionId}/{restaurantId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @GetMapping("check-menu-item")
     @Operation(summary = "Проверить есть ли на складе ресторана определенные menuItemOption")
-    fun checkMenuItem(@PathVariable menuItemOptionId: Long, @PathVariable restaurantId: Long): Boolean {
-        return orderService.check(menuItemOptionId, restaurantId)
+    fun checkMenuItem(@RequestParam menuItemOptionId: Long, @RequestParam restaurantId: Long): Boolean {
+        return orderService.check(listOf(menuItemOptionId), restaurantId)
     }
 
     @GetMapping("/currentOrdersInRestaurant")
@@ -31,7 +31,7 @@ class OrderController() {
         return orderService.currentOrdersInRestaurant(restaurantId)
     }
 
-    @PostMapping("/changeStatus")
+    @PatchMapping("/changeStatus")
     @Operation(summary = "Изменить статус заказа")
     fun changeOrderStatus(@RequestParam orderId: Long, @RequestParam statusId: Long): Order {
         return orderService.changeStatusOrder(orderId, statusId)
@@ -54,17 +54,10 @@ class OrderController() {
 
 
     @GetMapping("/statuses")
-    fun getStatuses(): List<OrderStatusResponse> {
-        return OrderStatus.values().map { OrderStatusResponse(it.id, it.name) }
+    @Operation(summary = "Получить все статусы")
+    fun getStatuses(): List<OrderStatusesDTO> {
+        return OrderStatus.values().map { OrderStatusesDTO(it.id, it.name) }
     }
 
-    data class OrderStatusResponse(val id: Long, val status: String)
 
-
-    @PatchMapping("/update-status/{orderId}/{statusId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun updateStatus(@RequestParam orderId: Long, @RequestParam statusId: Long) {
-        orderService.updateOrderStatus(orderId, statusId)
-
-    }
 }
