@@ -21,7 +21,10 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { url = uri("https://artifactory-oss.prod.netflix.net/artifactory/maven-oss-candidates") }
 }
+
+extra["springCloudVersion"] = "2021.0.2"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
@@ -38,6 +41,13 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+    }
 }
 
 tasks.withType<KotlinCompile> {
