@@ -3,9 +3,11 @@ package com.tastypizza.menuorders.services
 import com.tastypizza.menuorders.entities.*
 import com.tastypizza.menuorders.enums.OrderStatus
 import com.tastypizza.menuorders.exceptions.IngredientsOutException
+import com.tastypizza.menuorders.exceptions.ResourceNotFoundException
 import com.tastypizza.menuorders.repositories.*
 import com.tastypizza.menuorders.requests.MakeOrderRequest
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.awt.Menu
 import java.time.LocalDateTime
@@ -28,6 +30,10 @@ class OrderService {
     @Autowired
     private lateinit var restaurantsIngredientsRepository: RestaurantsIngredientsRepository
 
+    @Autowired
+    private lateinit var restaurantsRepository: RestaurantsRepository
+
+
     fun currentOrders(user: User): List<Order> {
         return orderRepository.findAllByClientIdAndStatusNot(user.id, OrderStatus.GIVEN)
     }
@@ -37,29 +43,25 @@ class OrderService {
     }
 
     @Transactional
-//  понял что сделал хуевый чек, ибо нужно учесть кол-во переданное в
-//  OrderItem некита + проверяю ингредиенты итеративно, то-есть на
-//  момент какой-либо итерации ингредиентов может
-//  не быть т.к уйдут на другой меню итем опшин.
-//  Фиксану завтра ща впадлу, спать буду
+    fun check(menuItemOptionId: Long, restaurantId: Long): Boolean {
+        if (!menuItemOptionRepository.existsById(menuItemOptionId)) throw ResourceNotFoundException("Опция с id = $menuItemOptionId не найдена")
+        if (!restaurantsRepository.existsById(restaurantId)) throw ResourceNotFoundException("Ресторан с id = $restaurantId не найден")
 
-    fun check(menuItemOptionId: List<Long>?, restaurantId: Long?): Boolean {
         val ingredientsMenuItemOptions: List<IngredientsMenuItemOptions> =
-            ingredientsMenuItemOptionsRepository.getAllByMenuItemOption(menuItemOptionId!!)
+            ingredientsMenuItemOptionsRepository.getAllByMenuItemOption(menuItemOptionId)
 
         val restaurantIngredients: List<RestaurantIngredients> =
-            restaurantsIngredientsRepository.getAllByRestaurantId(restaurantId!!)
+            restaurantsIngredientsRepository.getAllByRestaurantId(restaurantId)
 
         for (ingredientsMenuItem in ingredientsMenuItemOptions) {
-
             for (restaurantIngredient in restaurantIngredients) {
-
-                if (ingredientsMenuItem.ingredient == restaurantIngredient.ingredient) {
-                    if (restaurantIngredient.count < ingredientsMenuItem.count) throw IngredientsOutException("Недостаточно ингредиентов для приготовления этого блюда")
+                if ((ingredientsMenuItem.ingredient == restaurantIngredient.ingredient)
+                    && (restaurantIngredient.count < ingredientsMenuItem.count)
+                ) {
+                    throw IngredientsOutException("Недостаточно ингредиентов для приготовления этого блюда")
                 }
             }
         }
-
         return true
     }
 
@@ -72,30 +74,37 @@ class OrderService {
     }
 
     @Transactional
-    fun order(makeOrderRequest: MakeOrderRequest): Boolean {
-
-        val menuItemOptions: MutableList<Long> = ArrayList()
-        for (orderItemDto in makeOrderRequest.listOfOrderItemDto!!) {
-            menuItemOptions.add(orderItemDto.menuItemOptionId)
-        }
-
-        check(menuItemOptions, makeOrderRequest.restaurantId)
+    fun order(makeOrderRequest: MakeOrderRequest): Long {
+        if (!restaurantsRepository.existsById(makeOrderRequest.restaurantId!!)) throw ResourceNotFoundException("Ресторан с id = ${makeOrderRequest.restaurantId} не найден")
 
         val order = Order()
         order.clientId = makeOrderRequest.clientId
         order.orderDate = makeOrderRequest.orderDate
         order.packing = makeOrderRequest.packing
         order.status = makeOrderRequest.status
-        orderRepository.save(order)
 
+        val restaurantIngredients: List<RestaurantIngredients> =
+            restaurantsIngredientsRepository.getAllByRestaurantId(makeOrderRequest.restaurantId)
 
         for (orderItemDto in makeOrderRequest.listOfOrderItemDto!!) {
-            val menuItemOption = menuItemOptionRepository.findById(orderItemDto.menuItemOptionId).get()
-//          если то что я написал в тг - верно, то нужно вместо
-//          уменьшения каунта меню итем опшиона сделать уменьшение
-//          ингредиентов используемых для этого меню итем
-//          опшиона * на orderItemDto.count именно в рестике, куда идет заказ
-            menuItemOption.count = menuItemOption.count - orderItemDto.count
+            val menuItemOption = menuItemOptionRepository.findByIdOrNull(orderItemDto.menuItemOptionId)
+                ?: throw ResourceNotFoundException("Опция не найдена!")
+
+            val ingredientsMenuItemOptions: List<IngredientsMenuItemOptions> =
+                ingredientsMenuItemOptionsRepository.getAllByMenuItemOption(orderItemDto.menuItemOptionId)
+
+            for (ingredientsMenuItem in ingredientsMenuItemOptions) {
+                for (restaurantIngredient in restaurantIngredients) {
+                    if ((ingredientsMenuItem.ingredient == restaurantIngredient.ingredient)) {
+
+                        if (restaurantIngredient.count < ingredientsMenuItem.count * orderItemDto.count)
+                            throw IngredientsOutException("Недостаточно ингредиентов для приготовления этого блюда")
+                        else
+                            restaurantIngredient.count -= ingredientsMenuItem.count * orderItemDto.count
+
+                    }
+                }
+            }
 
             val orderItem = OrderItem()
             orderItem.order = order
@@ -103,7 +112,8 @@ class OrderService {
             orderItem.count = orderItemDto.count
             orderItemRepository.save(orderItem)
         }
-        return true
+        orderRepository.save(order)
+        return order.id!!
     }
 
     fun todayOrders(restaurantId: Long): List<Order> {

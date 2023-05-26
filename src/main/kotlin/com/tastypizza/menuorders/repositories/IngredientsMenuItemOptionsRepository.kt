@@ -9,11 +9,12 @@ import java.util.*
 
 @Repository
 interface IngredientsMenuItemOptionsRepository : JpaRepository<IngredientsMenuItemOptions, Long> {
-    @Query(nativeQuery = true, value =
-        "SELECT * FROM ingredients_menu_item_options WHERE menu_item_option_id in :menuItemOptions_id"
+    @Query(
+        nativeQuery = true, value =
+        "SELECT * FROM ingredients_menu_item_options WHERE menu_item_option_id =:menuItemOptions_id"
     )
     fun getAllByMenuItemOption(
-        @Param("menuItemOptions_id") menuItemOptionsId: List<Long>
+        @Param("menuItemOptions_id") menuItemOptionsId: Long
     ): List<IngredientsMenuItemOptions>
 }
 

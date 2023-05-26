@@ -21,9 +21,10 @@ class OrderController() {
     private lateinit var orderService: OrderService
 
     @GetMapping("check-menu-item")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Проверить есть ли на складе ресторана определенные menuItemOption")
-    fun checkMenuItem(@RequestParam menuItemOptionId: Long, @RequestParam restaurantId: Long): Boolean {
-        return orderService.check(listOf(menuItemOptionId), restaurantId)
+    fun checkMenuItem(@RequestParam menuItemOptionId: Long, @RequestParam restaurantId: Long) {
+        orderService.check(menuItemOptionId, restaurantId)
     }
 
     @GetMapping("/currentOrdersInRestaurant")
@@ -40,11 +41,8 @@ class OrderController() {
 
     @PostMapping()
     @Operation(summary = "Сделать заказ")
-    fun order(@RequestBody makeOrderRequest: MakeOrderRequest): Boolean {
-        print(makeOrderRequest.clientId)
-        print(makeOrderRequest.toString())
-        return orderService.order(makeOrderRequest)
-
+    fun order(@RequestBody makeOrderRequest: MakeOrderRequest): Long {
+       return orderService.order(makeOrderRequest)
     }
 
     @GetMapping("/todayOrders")
