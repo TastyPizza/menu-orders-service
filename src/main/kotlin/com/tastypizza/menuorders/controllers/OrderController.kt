@@ -1,11 +1,10 @@
 package com.tastypizza.menuorders.controllers
 
+import com.tastypizza.menuorders.dto.OrderDTO
 import com.tastypizza.menuorders.dto.OrderStatusesDTO
 import com.tastypizza.menuorders.entities.Order
-import com.tastypizza.menuorders.entities.User
 import com.tastypizza.menuorders.enums.OrderStatus
 import com.tastypizza.menuorders.requests.MakeOrderRequest
-import com.tastypizza.menuorders.services.MenuItemService
 import com.tastypizza.menuorders.services.OrderService
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.beans.factory.annotation.Autowired
@@ -47,7 +46,7 @@ class OrderController() {
 
     @GetMapping("/todayOrders")
     @Operation(summary = "Вернуть все заказы из ресторана за сегодня")
-    fun todayOrders(@RequestParam restaurantId: Long): List<Order> {
+    fun todayOrders(@RequestParam restaurantId: Long): List<OrderDTO>{
         return orderService.todayOrders(restaurantId)
     }
 
@@ -57,6 +56,4 @@ class OrderController() {
     fun getStatuses(): List<OrderStatusesDTO> {
         return OrderStatus.values().map { OrderStatusesDTO(it.id, it.name) }
     }
-
-
 }
