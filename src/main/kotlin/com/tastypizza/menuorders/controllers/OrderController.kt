@@ -46,7 +46,7 @@ class OrderController() {
 
     @GetMapping("/todayOrders")
     @Operation(summary = "Вернуть все заказы из ресторана за сегодня")
-    fun todayOrders(@RequestParam restaurantId: Long): List<OrderDTO>{
+    fun todayOrders(@RequestParam restaurantId: Long): List<Order>{
         return orderService.todayOrders(restaurantId)
     }
 

@@ -119,7 +119,7 @@ class OrderService {
     fun todayOrders(restaurantId: Long): List<Order> {
         val startDate = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)
         val endDate = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59)
-        return orderRepository.findByOrderDateBetween(startDate, endDate)
+        return orderRepository.findAllByOrderDateBetween(startDate, endDate)
     }
 
 

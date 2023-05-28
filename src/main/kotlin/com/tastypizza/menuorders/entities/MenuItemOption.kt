@@ -23,6 +23,7 @@ data class MenuItemOption (
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "menuItem_id")
+    @JsonIgnore
     val menuItem: MenuItem?=null,
 
 

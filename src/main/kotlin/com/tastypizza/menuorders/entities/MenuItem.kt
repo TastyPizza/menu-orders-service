@@ -18,7 +18,6 @@ data class MenuItem (
     val description: String?="",
 
     @OneToMany(mappedBy = "menuItem", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
-    @com.fasterxml.jackson.annotation.JsonIgnore
     val menuItemOptions: MutableList<MenuItemOption> = mutableListOf(),
 
 
