@@ -95,7 +95,7 @@ class OrderService {
 
             for (ingredientsMenuItem in ingredientsMenuItemOptions) {
                 for (restaurantIngredient in restaurantIngredients) {
-                    if ((ingredientsMenuItem.ingredient == restaurantIngredient.ingredient)) {
+                    if ((ingredientsMenuItem.ingredient.id == restaurantIngredient.ingredient.id)) {
 
                         if (restaurantIngredient.count < ingredientsMenuItem.count * orderItemDto.count)
                             throw IngredientsOutException("Недостаточно ингредиентов для приготовления этого блюда")
