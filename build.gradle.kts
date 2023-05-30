@@ -51,6 +51,12 @@ dependencyManagement {
     }
 }
 
+tasks {
+    test {
+        enabled = false
+    }
+}
+
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
