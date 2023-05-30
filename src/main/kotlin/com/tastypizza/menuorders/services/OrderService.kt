@@ -47,15 +47,15 @@ class OrderService {
         if (!restaurantsRepository.existsById(restaurantId)) throw ResourceNotFoundException("Ресторан с id = $restaurantId не найден")
 
         val ingredientsMenuItemOptions: List<IngredientsMenuItemOptions> =
-            ingredientsMenuItemOptionsRepository.getAllByMenuItemOption(menuItemOptionId)
+                ingredientsMenuItemOptionsRepository.getAllByMenuItemOption(menuItemOptionId)
 
         val restaurantIngredients: List<RestaurantIngredients> =
-            restaurantsIngredientsRepository.getAllByRestaurantId(restaurantId)
+                restaurantsIngredientsRepository.getAllByRestaurantId(restaurantId)
 
         for (ingredientsMenuItem in ingredientsMenuItemOptions) {
             for (restaurantIngredient in restaurantIngredients) {
                 if ((ingredientsMenuItem.ingredient == restaurantIngredient.ingredient)
-                    && (restaurantIngredient.count < ingredientsMenuItem.count)
+                        && (restaurantIngredient.count < ingredientsMenuItem.count)
                 ) {
                     throw IngredientsOutException("Недостаточно ингредиентов для приготовления этого блюда")
                 }
@@ -81,23 +81,25 @@ class OrderService {
         order.orderDate = makeOrderRequest.orderDate
         order.packing = makeOrderRequest.packing
         order.status = makeOrderRequest.status
+        order.restaurantId = makeOrderRequest.restaurantId
+        orderRepository.save(order)
 
         val restaurantIngredients: List<RestaurantIngredients> =
-            restaurantsIngredientsRepository.getAllByRestaurantId(makeOrderRequest.restaurantId)
+                restaurantsIngredientsRepository.getAllByRestaurantId(makeOrderRequest.restaurantId)
 
         for (orderItemDto in makeOrderRequest.listOfOrderItemDto!!) {
             val menuItemOption = menuItemOptionRepository.findByIdOrNull(orderItemDto.menuItemOptionId)
-                ?: throw ResourceNotFoundException("Опция не найдена!")
+                    ?: throw ResourceNotFoundException("Опция ${orderItemDto.menuItemOptionId} не найдена!")
 
             val ingredientsMenuItemOptions: List<IngredientsMenuItemOptions> =
-                ingredientsMenuItemOptionsRepository.getAllByMenuItemOption(orderItemDto.menuItemOptionId)
+                    ingredientsMenuItemOptionsRepository.getAllByMenuItemOption(orderItemDto.menuItemOptionId)
 
             for (ingredientsMenuItem in ingredientsMenuItemOptions) {
                 for (restaurantIngredient in restaurantIngredients) {
                     if ((ingredientsMenuItem.ingredient.id == restaurantIngredient.ingredient.id)) {
 
                         if (restaurantIngredient.count < ingredientsMenuItem.count * orderItemDto.count)
-                            throw IngredientsOutException("Недостаточно ингредиентов для приготовления этого блюда")
+                            throw IngredientsOutException("Недостаточно ингредиентов для приготовления блюда ${menuItemOption.menuItem!!.name}${menuItemOption.name}")
                         else
                             restaurantIngredient.count -= ingredientsMenuItem.count * orderItemDto.count
 
@@ -111,7 +113,6 @@ class OrderService {
             orderItem.count = orderItemDto.count
             orderItemRepository.save(orderItem)
         }
-        orderRepository.save(order)
         return order.id!!
     }
 

@@ -19,7 +19,7 @@ data class Order (
 
 
     var clientId: Long?=0,
-    var restaurantId: Int?=0,
+    var restaurantId: Long?=0,
     var orderDate: LocalDateTime?= LocalDateTime.now(),
     var status: OrderStatus?=OrderStatus.NEW,
     var packing: Boolean?=false,
