@@ -8,14 +8,12 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 
-import org.mockito.InjectMocks
-import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
 import java.time.LocalDateTime
 
 @ExtendWith(MockitoExtension::class)
-class OrderTestJotkin {
+class OrderTestKotlin {
 
 
     private var orderRepository: OrderRepository = Mockito.mock(OrderRepository::class.java)
@@ -53,8 +51,8 @@ class OrderTestJotkin {
         val order2 = Order()
         order2.orderDate = LocalDateTime.now()
         order2.packing = false
-        val startDate = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)
-        val endDate = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59)
+        val startDate = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)
+        val endDate = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(0)
         val orderList: MutableList<Order> = ArrayList()
         orderList.add(order1)
         orderList.add(order2)
