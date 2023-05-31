@@ -11,15 +11,15 @@ import javax.persistence.*
 @Table(name="menuItemOption")
 data class MenuItemOption (
     var count: Long=0,
-    val name: String="",
-    val pictureId: String="",
-    val price: Int=0,
-    val weight: Int=0,
-    val nutritional: Int=0,
-    val proteins: Int=0,
-    val fats: Int=0,
-    val carbohydrates: Int=0,
-    val traditionalDough: Boolean=false,
+    var name: String="",
+    var pictureId: String="",
+    var price: Int=0,
+    var weight: Int=0,
+    var nutritional: Int=0,
+    var proteins: Int=0,
+    var fats: Int=0,
+    var carbohydrates: Int=0,
+    var traditionalDough: Boolean=false,
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "menuItem_id")

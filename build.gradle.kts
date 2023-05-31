@@ -1,3 +1,4 @@
+import org.gradle.internal.impldep.org.fusesource.jansi.AnsiRenderer.test
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -43,6 +44,8 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
+    testImplementation("junit:junit:4.13.2")
+
 }
 
 dependencyManagement {
@@ -51,11 +54,15 @@ dependencyManagement {
     }
 }
 
-tasks {
-    test {
-        enabled = false
-    }
-}
+//tasks {
+//    test {
+//        useJUnitPlatform()
+//        testLogging {
+//            events("passed", "skipped", "failed")
+//        }
+//        enabled = false
+//    }
+//}
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
@@ -64,6 +71,7 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
+//tasks.withType<Test> {
+//    useJUnitPlatform()
+//}
+
