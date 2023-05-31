@@ -13,9 +13,7 @@ import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Service
-class OrderService {
-    @Autowired
-    private lateinit var orderRepository: OrderRepository
+class OrderService @Autowired constructor(private val orderRepository: OrderRepository){
 
     @Autowired
     private lateinit var menuItemOptionRepository: MenuItemOptionRepository
@@ -31,6 +29,8 @@ class OrderService {
 
     @Autowired
     private lateinit var restaurantsRepository: RestaurantsRepository
+
+
 
 
     fun currentOrders(user: User): List<Order> {

@@ -5,6 +5,7 @@ import com.tastypizza.menuorders.repositories.*
 import com.tastypizza.menuorders.services.OrderService
 import org.junit.Test
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 
 import org.mockito.InjectMocks
@@ -16,27 +17,33 @@ import java.time.LocalDateTime
 @ExtendWith(MockitoExtension::class)
 class OrderTestJotkin {
 
-    @Mock
-    private val orderRepository: OrderRepository? = null
 
-    @Mock
-    private val menuItemOptionRepository: MenuItemOptionRepository? = null
+    private var orderRepository: OrderRepository = Mockito.mock(OrderRepository::class.java)
 
-    @Mock
-    private val orderItemRepository: OrderItemRepository? = null
+//    @Mock
+//    private val menuItemOptionRepository: MenuItemOptionRepository? = null
+//
+//    @Mock
+//    private val orderItemRepository: OrderItemRepository? = null
+//
+//    @Mock
+//    private val ingredientsMenuItemOptionsRepository: IngredientsMenuItemOptionsRepository? = null
+//
+//    @Mock
+//    private val restaurantsIngredientsRepository: RestaurantsIngredientsRepository? = null
+//
+//    @Mock
+//    private val restaurantsRepository: RestaurantsRepository? = null
 
-    @Mock
-    private val ingredientsMenuItemOptionsRepository: IngredientsMenuItemOptionsRepository? = null
 
-    @Mock
-    private val restaurantsIngredientsRepository: RestaurantsIngredientsRepository? = null
+    private  var orderService: OrderService = OrderService(orderRepository)
 
-    @Mock
-    private val restaurantsRepository: RestaurantsRepository? = null
+    @BeforeEach
+    fun setup(){
+        orderRepository = Mockito.mock(OrderRepository::class.java)
+        orderService = OrderService(orderRepository)
 
-    @InjectMocks
-    private val orderService: OrderService? = null
-
+    }
 
     @Test
     fun todayOrdersTest() {
@@ -51,9 +58,12 @@ class OrderTestJotkin {
         val orderList: MutableList<Order> = ArrayList()
         orderList.add(order1)
         orderList.add(order2)
-        Mockito.`when`<List<Order>>(orderRepository!!.findAllByOrderDateBetween(startDate, endDate))
+
+        Mockito.`when`<List<Order>>(orderRepository.findAllByOrderDateBetween(startDate, endDate))
             .thenReturn(orderList)
-        val orderListFromService = orderService!!.todayOrders(1)
+
+        val orderListFromService = orderService.todayOrders(1)
         Assertions.assertFalse(orderListFromService.isEmpty())
+
     }
 }
