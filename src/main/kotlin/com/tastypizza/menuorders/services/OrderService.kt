@@ -13,26 +13,8 @@ import java.time.LocalDateTime
 import javax.transaction.Transactional
 
 @Service
-class OrderService @Autowired constructor(private val orderRepository: OrderRepository){
-
-    @Autowired
-    private lateinit var menuItemOptionRepository: MenuItemOptionRepository
-
-    @Autowired
-    private lateinit var orderItemRepository: OrderItemRepository
-
-    @Autowired
-    private lateinit var ingredientsMenuItemOptionsRepository: IngredientsMenuItemOptionsRepository
-
-    @Autowired
-    private lateinit var restaurantsIngredientsRepository: RestaurantsIngredientsRepository
-
-    @Autowired
-    private lateinit var restaurantsRepository: RestaurantsRepository
-
-
-
-
+class OrderService @Autowired constructor(private val orderRepository: OrderRepository, private val menuItemOptionRepository: MenuItemOptionRepository, private val restaurantsRepository: RestaurantsRepository,
+    private val orderItemRepository: OrderItemRepository, private val ingredientsMenuItemOptionsRepository: IngredientsMenuItemOptionsRepository, private val restaurantsIngredientsRepository: RestaurantsIngredientsRepository) {
     fun currentOrders(user: User): List<Order> {
         return orderRepository.findAllByClientIdAndStatusNot(user.id, OrderStatus.GIVEN)
     }
@@ -96,12 +78,16 @@ class OrderService @Autowired constructor(private val orderRepository: OrderRepo
 
             for (ingredientsMenuItem in ingredientsMenuItemOptions) {
                 for (restaurantIngredient in restaurantIngredients) {
-                    if ((ingredientsMenuItem.ingredient.id == restaurantIngredient.ingredient.id)) {
+                    try {
+                        if ((ingredientsMenuItem.ingredient.id == restaurantIngredient.ingredient.id)) {
 
-                        if (restaurantIngredient.count < ingredientsMenuItem.count * orderItemDto.count)
-                            throw IngredientsOutException("Недостаточно ингредиентов для приготовления блюда ${menuItemOption.menuItem!!.name}${menuItemOption.name}")
-                        else
-                            restaurantIngredient.count -= ingredientsMenuItem.count * orderItemDto.count
+                            if (restaurantIngredient.count < ingredientsMenuItem.count * orderItemDto.count)
+                                throw IngredientsOutException("Недостаточно ингредиентов для приготовления блюда ${menuItemOption.menuItem!!.name}${menuItemOption.name}")
+                            else
+                                restaurantIngredient.count -= ingredientsMenuItem.count * orderItemDto.count
+
+                        }
+                    } catch (_: Exception) {
 
                     }
                 }

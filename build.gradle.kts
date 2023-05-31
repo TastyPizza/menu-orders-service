@@ -45,6 +45,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-inline:2.13.0")
 
 }
 
