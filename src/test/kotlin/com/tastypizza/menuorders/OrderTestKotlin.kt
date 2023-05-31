@@ -36,12 +36,7 @@ class OrderTestKotlin {
 
     private  var orderService: OrderService = OrderService(orderRepository)
 
-    @BeforeEach
-    fun setup(){
-        orderRepository = Mockito.mock(OrderRepository::class.java)
-        orderService = OrderService(orderRepository)
 
-    }
 
     @Test
     fun todayOrdersTest() {
@@ -62,6 +57,7 @@ class OrderTestKotlin {
 
         val orderListFromService = orderService.todayOrders(1)
         Assertions.assertFalse(orderListFromService.isEmpty())
-
+        Assertions.assertEquals(orderListFromService[0], order1)
+        Assertions.assertEquals(orderListFromService[1], order2)
     }
 }
