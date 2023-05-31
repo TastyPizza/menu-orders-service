@@ -1,6 +1,7 @@
 package com.tastypizza.menuorders
 
 import com.tastypizza.menuorders.entities.Order
+import com.tastypizza.menuorders.enums.OrderStatus
 import com.tastypizza.menuorders.repositories.*
 import com.tastypizza.menuorders.services.OrderService
 import org.junit.Test
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
 import java.time.LocalDateTime
+import java.util.*
+import kotlin.collections.ArrayList
 
 @ExtendWith(MockitoExtension::class)
 class OrderTestKotlin {
@@ -52,12 +55,31 @@ class OrderTestKotlin {
         orderList.add(order1)
         orderList.add(order2)
 
-        Mockito.`when`<List<Order>>(orderRepository.findAllByOrderDateBetween(startDate, endDate))
+        Mockito
+            .`when`<List<Order>>(orderRepository.findAllByOrderDateBetween(startDate, endDate))
             .thenReturn(orderList)
 
         val orderListFromService = orderService.todayOrders(1)
         Assertions.assertFalse(orderListFromService.isEmpty())
         Assertions.assertEquals(orderListFromService[0], order1)
         Assertions.assertEquals(orderListFromService[1], order2)
+    }
+
+
+    @Test
+    fun changeStatusTest(){
+        var order1 = Order()
+        order1.orderDate = LocalDateTime.now()
+        order1.packing = true
+        order1.status = OrderStatus.NEW
+        Assertions.assertTrue(order1.status == OrderStatus.NEW)
+
+        Mockito
+            .`when`<Optional<Order>>(orderRepository.findById(1))
+            .thenReturn(Optional.of(order1))
+
+        order1 = orderService.changeStatusOrder(1, 3)
+        Assertions.assertTrue(order1.status == OrderStatus.GIVEN)
+
     }
 }
