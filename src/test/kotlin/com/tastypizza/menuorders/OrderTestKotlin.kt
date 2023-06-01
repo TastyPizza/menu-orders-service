@@ -118,4 +118,27 @@ class OrderTestKotlin {
         Assertions.assertTrue(order1.status == OrderStatus.GIVEN)
 
     }
+
+    @Test
+    fun currentOrdersInRestaurants() {
+        val givenOrders = listOf(
+                Order(restaurantId = 1, status = OrderStatus.GIVEN),
+                Order(restaurantId = 1, status = OrderStatus.GIVEN),
+                Order(id = 3, restaurantId = 1, status = OrderStatus.GIVEN)
+        )
+
+        Mockito.`when`(orderRepository.findAllByRestaurantIdAndStatusNot(1, OrderStatus.GIVEN)).thenReturn(givenOrders as MutableList<Order>?)
+
+
+        val emptyList: List<Order> = emptyList()
+        Assertions.assertEquals(emptyList,orderService.currentOrdersInRestaurant(2))
+
+
+        val givenResult = orderService.currentOrdersInRestaurant(1)
+        Assertions.assertEquals(3, givenResult.size)
+        Assertions.assertEquals(givenOrders[0], givenResult[0])
+        Assertions.assertEquals(givenOrders[1], givenResult[1])
+    }
+
+
 }
